@@ -352,7 +352,7 @@ NGINX
 
 ```
 let fmt = get(g:, 'plug_url_format', 'https://git::@github.com/%s.git')
-\ '^https://git::@github\.com', 'https://github.com', '')
+\ '^https://git::@githubfast\.com', 'https://githubfast.com', '')
 
 NGINX
 ```
@@ -361,7 +361,7 @@ NGINX
 
 ```
 let fmt = get(g:, 'plug_url_format', 'https://git::@hub.fastgit.org/%s.git')
-\ '^https://git::@hub.fastgit\.org', 'https://hub.fastgit.org', '')
+\ '^https://git::@githubfast\.com', 'https://githubfast.com', '')
 
 NGINX
 ```
