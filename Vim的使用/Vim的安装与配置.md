@@ -76,7 +76,7 @@ MIPSASM
 
 Homebrew版本vim优先级高于系统自带版本。如果不知道怎么安装Homebrew：[一篇文章，多种方法安装Homebrew](https://www.mintimate.cn/2020/04/05/Homebrew/)
 
-## Windwos
+## Windows
 
 没错，Vim是垮系统的，Windows也可以安装。（这不比系统自带的**文本编辑器**好用？）
 
