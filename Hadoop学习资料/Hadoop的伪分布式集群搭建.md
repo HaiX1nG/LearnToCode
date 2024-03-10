@@ -103,6 +103,9 @@ drwxr-xr-x. 2 root root 6 Mar 10 17:16 software
 [katomegumi@master software]$ ll
 total 0
 drwxr-xr-x. 2 root root 6 Mar 10 17:16 hadoop
+[katomegumi@master software]$ cd ..
+[katomegumi@master opt]$ sudo chown -R katomegumi:katomegumi software
+[katomegumi@master opt]$ cd software/
 [katomegumi@master software]$ sudo tar -zxvf /var/ftp/pub/hadoop-3.3.3.tar.gz -C /opt/software/hadoop
 # 此处省略N多个解压条目
 [katomegumi@master software]$ ll
