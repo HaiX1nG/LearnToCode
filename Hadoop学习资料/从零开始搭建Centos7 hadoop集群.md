@@ -15,6 +15,7 @@
         8. 配置`docker`
         9. 配置`hadoop`环境
         10. `hadoop`伪分布式的实现
+        11. `hadoop`完全分布式的实现
 
 还请同学们耐心跟着教程一步一步搭建！:smile:
 
@@ -3210,3 +3211,484 @@ ok,伪分布式集群搭建完毕，我们打开自己的浏览器输入ip:9870,
 <hr />
 
 __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点个赞:grin:__
+
+<hr />
+
+## 十一、 `hadoop`完全分布式的实现
+
+#### 做这一步之前我们先保存三个机子的快照！
+
+用`finalshell`打开master的bash
+
+```bash
+[xuhaixing@master hadoop-3.3.3]$ cd
+[xuhaixing@master ~]$ cd /opt/software/hadoop/hadoop-3.3.3/etc/hadoop/
+[xuhaixing@master hadoop]$ vim ./core-site.xml
+[xuhaixing@master hadoop]$ vim ./hdfs-site.xml
+[xuhaixing@master hadoop]$ vim ./yarn-site.xml
+[xuhaixing@master hadoop]$ vim ./mapred-site.xml
+[xuhaixing@master hadoop]$ vim ./slaves
+```
+
+`core-site.xml`配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+         <property>
+                <name>fs.defaultFS</name>
+                <value>hdfs://master:9000</value>
+        </property>
+         <property>
+                <name>hadoop.tmp.dir</name>
+                <value>/opt/software/hadoop/hadoop-3.3.3/tmp/</value>
+        </property>
+</configuration>
+```
+
+`hdfs-site.xml`配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+        <property>
+                <name>dfs.namenode.http-address</name>
+                <value>master:50070</value>
+        </property>
+        <property>
+                <name>dfs.namenode.secondary.http-address</name>
+                <value>slave1:50090</value>
+        </property>
+         <property>
+                <name>dfs.replication</name>
+                <value>3</value>
+        </property>
+        <property>
+                <name>dfs.namenode.name.dir</name>
+                <value>/opt/software/hadoop/hadoop-3.3.3/tmp/dfs/name</value>
+        </property>
+        <property>
+                <name>dfs.datanode.data.dir</name>
+                <value>/opt/software/hadoop/hadoop-3.3.3/tmp/dfs/data</value>
+         </property>
+</configuration>
+
+```
+
+`yarn-site.xml`配置
+
+```xml
+<?xml version="1.0"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+<configuration>
+
+<!-- Site specific YARN configuration properties -->
+        <property>
+                <name>yarn.resourcemanager.hostsname</name>
+                <value>master</value>
+        </property>
+        <property>
+                <name>yarn.resourcemanager.webapp.address</name>
+                <value>master:8088</value>
+        </property>
+        <property>
+                <name>yarn.nodemanager.aux-services</name>
+                <value>mapreduce_shuffle</value>
+         </property>
+        <property>
+                <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+                <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+        </property>
+        <property>
+                <name>yarn.log-aggregation-enable</name>
+                <value>true</value>
+        </property>
+        <property>
+                <name>yarn.log-aggregation.retain-seconds</name>
+                <value>106800</value>
+         </property>
+         <property>
+                <name>yarn.nodemanager.remote-app-log-dir</name>
+                <value>/opt/software/container/logs</value>
+        </property>
+</configuration>
+```
+
+`mapred-site.xml`配置
+
+```xml
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+ <property>
+     <name>mapreduce.framework.name</name>
+     <value>yarn</value>
+ </property>
+ <property>
+     <name>mapreduce.jobhistory.address</name>
+     <value>slave2:10020</value>
+ </property>
+ <property>
+     <name>mapreduce.jobhistory.webapp.address</name>
+     <value>slave2:19888</value>
+ </property>
+ <property>
+     <name>mapreduce.jobhistory.intermediate-done-dir</name>
+     <value>${hadoop.tmp.dir}/mr-history/tmp</value>
+ </property>
+ <property>
+     <name>mapreduce.jobhistory.done-dir</name>
+     <value>${hadoop.tmp.dir}/mr-history/done</value>
+ </property>
+</configuration>
+
+```
+
+`slaves`配置
+
+```sh
+master
+slave1
+slave2
+```
+
+接下来我们做一下ssh免密登录，由于我master主机给自己免密过了，接下来就不用给自己免密了
+
+```bash
+[xuhaixing@master hadoop]$ ssh-copy-id slave1
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.ssh/id_rsa.pub"
+The authenticity of host 'slave1 (200.200.200.11)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+xuhaixing@slave1's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'slave1'"
+and check to make sure that only the key(s) you wanted were added.
+
+[xuhaixing@master hadoop]$ ssh-copy-id slave2
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.ssh/id_rsa.pub"
+The authenticity of host 'slave2 (200.200.200.12)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+xuhaixing@slave2's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'slave2'"
+and check to make sure that only the key(s) you wanted were added.
+```
+
+我们把视角转移到slave1
+
+```bash
+[xuhaixing@slave1 ~]$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/xuhaixing/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/xuhaixing/.ssh/id_rsa.
+Your public key has been saved in /home/xuhaixing/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:vM8SnPaPTN8B3+FMXbhUOiUf1muYCRt9yaeW0bsuD64 xuhaixing@slave1
+The key's randomart image is:
++---[RSA 2048]----+
+|            . o+=|
+|           o .o@=|
+|            + X+*|
+|       .   . =+*o|
+|       .S.  ..ooo|
+|        =.   o+o.|
+|       ..o.  .+o.|
+|        .=.o.o.o |
+|         .=E+.+. |
++----[SHA256]-----+
+[xuhaixing@slave1 ~]$ ssh-copy-id slave1
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.                                                                    ssh/id_rsa.pub"
+The authenticity of host 'slave1 (200.200.200.11)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter                                                                     out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompt                                                                    ed now it is to install the new keys
+xuhaixing@slave1's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'slave1'"
+and check to make sure that only the key(s) you wanted were added.
+
+[xuhaixing@slave1 ~]$ ssh-copy-id slave2
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.                                                                    ssh/id_rsa.pub"
+The authenticity of host 'slave2 (200.200.200.12)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter                                                                     out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompt                                                                    ed now it is to install the new keys
+xuhaixing@slave2's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'slave2'"
+and check to make sure that only the key(s) you wanted were added.
+
+[xuhaixing@slave1 ~]$ ssh-copy-id master
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.                                                                    ssh/id_rsa.pub"
+The authenticity of host 'master (200.200.200.10)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter                                                                     out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompt                                                                    ed now it is to install the new keys
+xuhaixing@master's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'master'"
+and check to make sure that only the key(s) you wanted were added.
+```
+
+我们再把视角转移到slave2
+
+```bash
+[xuhaixing@slave2 ~]$ ssh-keygen -t rsa
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/xuhaixing/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/xuhaixing/.ssh/id_rsa.
+Your public key has been saved in /home/xuhaixing/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:P1NCb1fiTYrE7RyNcGMwCOvSOVXR3vpMnwvJD7mio/g xuhaixing@slave2
+The key's randomart image is:
++---[RSA 2048]----+
+|        .. .*++  |
+|         ..o *.+ |
+|        . o o.=.+|
+|       o + o =.B.|
+|      . S . = *..|
+|       . o +..+ .|
+|          +  * +o|
+|      .  . +  =.+|
+|     ..E..o .. o.|
++----[SHA256]-----+
+[xuhaixing@slave2 ~]$ ssh-copy-id slave2
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.                                                                    ssh/id_rsa.pub"
+The authenticity of host 'slave2 (200.200.200.12)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter                                                                     out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompt                                                                    ed now it is to install the new keys
+xuhaixing@slave2's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'slave2'"
+and check to make sure that only the key(s) you wanted were added.
+
+[xuhaixing@slave2 ~]$ ssh-copy-id slave1
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.                                                                    ssh/id_rsa.pub"
+The authenticity of host 'slave1 (200.200.200.11)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter                                                                     out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompt                                                                    ed now it is to install the new keys
+xuhaixing@slave1's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'slave1'"
+and check to make sure that only the key(s) you wanted were added.
+
+[xuhaixing@slave2 ~]$ ssh-copy-id master
+/usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/xuhaixing/.                                                                    ssh/id_rsa.pub"
+The authenticity of host 'master (200.200.200.10)' can't be established.
+ECDSA key fingerprint is SHA256:3GuZfE/nrlF26oOH6Vv/Dl964VawhyMtrJPRb6V7ld4.
+ECDSA key fingerprint is MD5:81:ed:e5:1b:de:76:51:94:f4:40:f7:d2:cd:78:16:ea.
+Are you sure you want to continue connecting (yes/no)? yes
+/usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter                                                                     out any that are already installed
+/usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompt                                                                    ed now it is to install the new keys
+xuhaixing@master's password:
+
+Number of key(s) added: 1
+
+Now try logging into the machine, with:   "ssh 'master'"
+and check to make sure that only the key(s) you wanted were added.
+```
+
+这样三台机子的免密都做好了！
+
+接下来分发一下`hadoop`配置
+
+```bash
+[xuhaixing@master hadoop]$ sudo scp -r /opt/software/ root@slave1:/opt/
+root@slave1's password:
+# 省略N行
+[xuhaixing@master hadoop]$ sudo scp -r /opt/software/ root@slave2:/opt/
+root@slave2's password:
+# 省略N行
+```
+
+然后我们为两个奴隶机的/opt/software授权给xuhaixing，运行会显示权限不足无法创建文件夹
+
+我们以slave1作为演示，slave2执行相同操作即可
+
+```bash
+[xuhaixing@slave1 ~]$ sudo chown -R xuhaixing:xuhaixing /opt/software/
+[sudo] password for xuhaixing:
+[xuhaixing@slave1 ~]$ cd /opt/
+[xuhaixing@slave1 opt]$ ll
+total 0
+drwxr-xr-x. 2 root      root       6 Oct 31  2018 rh
+drwxr-xr-x. 3 xuhaixing xuhaixing 20 Mar 13 18:47 software
+```
+
+ok，搭建完毕了，我们来把三台机子的`hadoop`集群全都启动！
+
+master之前搭建了为分布式集群，我们要先停止之前的进程，不然会失败
+
+```bash
+[xuhaixing@master ~]$ jps
+5639 NameNode
+6008 SecondaryNameNode
+5801 DataNode
+7801 Jps
+[xuhaixing@master ~]$ cd /opt/software/hadoop/hadoop-3.3.3/
+[xuhaixing@master hadoop-3.3.3]$ sbin/stop-dfs.sh
+Stopping namenodes on [master]
+Stopping datanodes
+Stopping secondary namenodes [master]
+[xuhaixing@master hadoop-3.3.3]$ jps
+8351 Jps
+```
+
+现在我们再来启动一下，三台机子全都执行以下三条命令
+
+> hdfs namenode -format
+>
+> sbin/start-all.sh
+>
+> jps
+
+我们查看启动后的进程
+
+master:
+
+```bash
+[xuhaixing@master hadoop-3.3.3]$ jps
+9172 NameNode
+9988 NodeManager
+9333 DataNode
+10140 Jps
+9677 ResourceManager
+```
+
+slave1:
+
+```bash
+[xuhaixing@slave1 hadoop-3.3.3]$ jps
+6808 DataNode
+7336 NodeManager
+6410 SecondaryNameNode
+7498 Jps
+```
+
+slave2:
+
+```bash
+[xuhaixing@slave2 hadoop-3.3.3]$ jps
+6518 DataNode
+7142 Jps
+6984 NodeManager
+```
+
+最后我们打开浏览器：输入ip:50070
+
+
+
+![](../images/42.png)
+
+![](../images/43.png)
+
+我们再输入ip:8088
+
+![](../images/44.png)
+
+看到这些页面我们的`hadoop`完全分布式也就搭建完毕了！
+
+__你们也做到这了吗?:happy:__
+
+<hr />
