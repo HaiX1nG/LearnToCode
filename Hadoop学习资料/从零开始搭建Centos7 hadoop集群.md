@@ -363,8 +363,6 @@ DNS2=202.101.224.69
 
 ```bash
 [xuhaixing@master ~]$ sudo systemctl restart network
-[xuhaixing@master ~]$ ping.baidu.com
-bash: ping.baidu.com: command not found...
 [xuhaixing@master ~]$ ping baidu.com
 PING baidu.com (39.156.66.10) 56(84) bytes of data.
 64 bytes from 39.156.66.10 (39.156.66.10): icmp_seq=1 ttl=128 time=33.0 ms
