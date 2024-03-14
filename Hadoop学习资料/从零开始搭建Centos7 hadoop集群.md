@@ -3692,3 +3692,52 @@ slave2:
 __你们也做到这了吗?:happy:__
 
 <hr />
+
+__所有同学向我看齐！__如果你们要重启集群，记得先试用`sbin/stop-all.sh`然后删除hadoop-3.3.3下的生成的tmp文件夹，具体命令可以参考我这里给的示例(这里用master机器做作为示例，两个奴隶机执行一样的操作即可)————此错误由__温志鹏__提出：
+
+```bash
+[xuhaixing@master hadoop-3.3.3]$ sbin/stop-all.sh
+WARNING: Stopping all Apache Hadoop daemons as xuhaixing in 10 seconds.
+WARNING: Use CTRL-C to abort.
+Stopping namenodes on [master]
+Stopping datanodes
+Stopping secondary namenodes [slave1]
+Stopping nodemanagers
+Stopping resourcemanager
+[xuhaixing@master hadoop-3.3.3]$ ll
+total 92
+drwxr-xr-x. 2 xuhaixing xuhaixing   203 Mar 13 18:48 bin
+drwxr-xr-x. 3 xuhaixing xuhaixing    20 Mar 13 18:48 etc
+drwxr-xr-x. 2 xuhaixing xuhaixing   106 Mar 13 18:48 include
+drwxr-xr-x. 3 xuhaixing xuhaixing    20 Mar 13 18:48 lib
+drwxr-xr-x. 4 xuhaixing xuhaixing   288 Mar 13 18:48 libexec
+-rw-r--r--. 1 xuhaixing xuhaixing 23472 Mar 13 22:46 LICENSE-binary
+drwxr-xr-x. 2 xuhaixing xuhaixing  4096 Mar 13 18:48 licenses-binary
+-rw-r--r--. 1 xuhaixing xuhaixing 15217 Mar 13 22:46 LICENSE.txt
+drwxrwxr-x. 3 xuhaixing xuhaixing  4096 Mar 15 00:45 logs
+-rw-r--r--. 1 xuhaixing xuhaixing 29473 Mar 13 22:46 NOTICE-binary
+-rw-r--r--. 1 xuhaixing xuhaixing  1541 Mar 13 22:46 NOTICE.txt
+-rw-r--r--. 1 xuhaixing xuhaixing   175 Mar 13 22:46 README.txt
+drwxr-xr-x. 3 xuhaixing xuhaixing  4096 Mar 13 18:48 sbin
+drwxr-xr-x. 4 xuhaixing xuhaixing    31 Mar 13 18:48 share
+drwxrwxr-x. 3 xuhaixing xuhaixing    26 Mar 15 00:49 tmp
+
+[xuhaixing@master hadoop-3.3.3]$ rm -r ./tmp/
+[xuhaixing@master hadoop-3.3.3]$ ll
+total 92
+drwxr-xr-x. 2 xuhaixing xuhaixing   203 May 10  2022 bin
+drwxr-xr-x. 3 xuhaixing xuhaixing    20 May 10  2022 etc
+drwxr-xr-x. 2 xuhaixing xuhaixing   106 May 10  2022 include
+drwxr-xr-x. 3 xuhaixing xuhaixing    20 May 10  2022 lib
+drwxr-xr-x. 4 xuhaixing xuhaixing   288 May 10  2022 libexec
+-rw-rw-r--. 1 xuhaixing xuhaixing 23472 May 10  2022 LICENSE-binary
+drwxr-xr-x. 2 xuhaixing xuhaixing  4096 May 10  2022 licenses-binary
+-rw-rw-r--. 1 xuhaixing xuhaixing 15217 May 10  2022 LICENSE.txt
+drwxrwxr-x. 3 xuhaixing xuhaixing  4096 Mar 14 16:45 logs
+-rw-rw-r--. 1 xuhaixing xuhaixing 29473 May 10  2022 NOTICE-binary
+-rw-rw-r--. 1 xuhaixing xuhaixing  1541 Apr 22  2022 NOTICE.txt
+-rw-rw-r--. 1 xuhaixing xuhaixing   175 Apr 22  2022 README.txt
+drwxr-xr-x. 3 xuhaixing xuhaixing  4096 May 10  2022 sbin
+drwxr-xr-x. 4 xuhaixing xuhaixing    31 May 10  2022 share
+```
+
