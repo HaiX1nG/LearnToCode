@@ -3225,7 +3225,7 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
 [xuhaixing@master hadoop]$ vim ./hdfs-site.xml
 [xuhaixing@master hadoop]$ vim ./yarn-site.xml
 [xuhaixing@master hadoop]$ vim ./mapred-site.xml
-[xuhaixing@master hadoop]$ vim ./slaves
+[xuhaixing@master hadoop]$ vim ./workers
 ```
 
 `core-site.xml`配置
@@ -3250,9 +3250,9 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-         <property>
+        <property>
                 <name>fs.defaultFS</name>
-                <value>hdfs://master:9000</value>
+                <value>hdfs://master:8020</value>
         </property>
          <property>
                 <name>hadoop.tmp.dir</name>
@@ -3285,11 +3285,11 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
 <configuration>
         <property>
                 <name>dfs.namenode.http-address</name>
-                <value>master:50070</value>
+                <value>master:9870</value>
         </property>
         <property>
                 <name>dfs.namenode.secondary.http-address</name>
-                <value>slave1:50090</value>
+                <value>slave2:9868</value>
         </property>
          <property>
                 <name>dfs.replication</name>
@@ -3303,6 +3303,10 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
                 <name>dfs.datanode.data.dir</name>
                 <value>/opt/software/hadoop/hadoop-3.3.3/tmp/dfs/data</value>
          </property>
+        <property>
+                <name>dfs.permissions</name>
+                <value>false</value>
+        </property>
 </configuration>
 
 ```
@@ -3327,33 +3331,23 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
 <configuration>
 
 <!-- Site specific YARN configuration properties -->
-        <property>
-                <name>yarn.resourcemanager.hostsname</name>
-                <value>master</value>
-        </property>
-        <property>
-                <name>yarn.resourcemanager.webapp.address</name>
-                <value>master:8088</value>
-        </property>
+ <!-- 指定 MR 走 shuffle -->
         <property>
                 <name>yarn.nodemanager.aux-services</name>
                 <value>mapreduce_shuffle</value>
-         </property>
+        </property>
+<!-- 指定 ResourceManager 的地址-->
         <property>
-                <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
-                <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+                <name>yarn.resourcemanager.hostname</name>
+                <value>slave1</value>
+        </property>
+<!-- 环境变量的继承 -->
+        <property>
+                <name>yarn.nodemanager.env-whitelist</name> <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME</value>
         </property>
         <property>
-                <name>yarn.log-aggregation-enable</name>
-                <value>true</value>
-        </property>
-        <property>
-                <name>yarn.log-aggregation.retain-seconds</name>
-                <value>106800</value>
-         </property>
-         <property>
-                <name>yarn.nodemanager.remote-app-log-dir</name>
-                <value>/opt/software/container/logs</value>
+                <name>yarn.nodemanager.vmem-check-enabled</name>
+                <value>false</value>
         </property>
 </configuration>
 ```
@@ -3380,32 +3374,24 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-
- <property>
-     <name>mapreduce.framework.name</name>
-     <value>yarn</value>
- </property>
- <property>
-     <name>mapreduce.jobhistory.address</name>
-     <value>slave2:10020</value>
- </property>
- <property>
-     <name>mapreduce.jobhistory.webapp.address</name>
-     <value>slave2:19888</value>
- </property>
- <property>
-     <name>mapreduce.jobhistory.intermediate-done-dir</name>
-     <value>${hadoop.tmp.dir}/mr-history/tmp</value>
- </property>
- <property>
-     <name>mapreduce.jobhistory.done-dir</name>
-     <value>${hadoop.tmp.dir}/mr-history/done</value>
- </property>
+<!-- 指定 MapReduce 程序运行在 Yarn 上 -->
+        <property>
+                <name>mapreduce.framework.name</name>
+                <value>yarn</value>
+        </property>
+        <property>
+                <name>mapreduce.jobhistory.address</name>
+                <value>master:10020</value>
+        </property>
+        <property>
+                <name>mapreduce.jobhistory.webapp.address</name>
+                <value>master:19888</value>
+        </property>
 </configuration>
 
 ```
 
-`slaves`配置
+`workers`配置
 
 ```sh
 master
@@ -3633,13 +3619,27 @@ Stopping secondary namenodes [master]
 8351 Jps
 ```
 
-现在我们再来启动一下，三台机子全都执行以下三条命令
+由于我们配置过了`workers`所以我们现在可以群启了，我们先进入master
 
-> hdfs namenode -format
->
-> sbin/start-all.sh
->
-> jps
+```bash
+[xuhaixing@master hadoop-3.3.3]$ hdfs namenode -format
+# 省略一些启动项
+[xuhaixing@master hadoop-3.3.3]$ start-dfs.sh
+Starting namenodes on [master]
+Starting datanodes
+Starting secondary namenodes [slave2]
+[xuhaixing@master hadoop-3.3.3]$ mapred --daemon start historyserver
+```
+
+然后再进入`slave1`:
+
+```
+[xuhaixing@slave1 hadoop-3.3.3]$ start-yarn.sh
+Starting resourcemanager
+Starting nodemanagers
+```
+
+
 
 我们查看启动后的进程
 
@@ -3647,47 +3647,96 @@ master:
 
 ```bash
 [xuhaixing@master hadoop-3.3.3]$ jps
-9172 NameNode
-9988 NodeManager
-9333 DataNode
-10140 Jps
-9677 ResourceManager
+5393 JobHistoryServer
+4770 NameNode
+5250 NodeManager
+4947 DataNode
+5453 Jps
 ```
 
 slave1:
 
 ```bash
 [xuhaixing@slave1 hadoop-3.3.3]$ jps
-6808 DataNode
-7336 NodeManager
-6410 SecondaryNameNode
-7498 Jps
+3443 Jps
+3108 NodeManager
+2971 ResourceManager
+2781 DataNode
 ```
 
 slave2:
 
 ```bash
 [xuhaixing@slave2 hadoop-3.3.3]$ jps
-6518 DataNode
-7142 Jps
-6984 NodeManager
+2899 SecondaryNameNode
+2775 DataNode
+3111 Jps
+3006 NodeManager
 ```
 
-最后我们打开浏览器：输入ip:50070
-
-
+最后我们打开浏览器：输入master的ip:9870
 
 ![](../images/42.png)
 
 ![](../images/43.png)
 
-我们再输入ip:8088
+我们再输入slave1的ip:8088
 
 ![](../images/44.png)
 
 看到这些页面我们的`hadoop`完全分布式也就搭建完毕了！
 
 __你们也做到这了吗?:happy:__
+
+
+
+在这里我们按照老师要求，把公共环境变量放在`/etc/profile`里，比如`JDK`。私有环境变量放在`~/.bash_profile`下，比如`HADOOP_HOME`
+
+
+
+我这里以master机器为示例，slave1和slave2也执行一样的操作，我就不演示了！
+
+```bash
+[xuhaixing@master hadoop]$ sudo vim /etc/profile
+[sudo] password for xuhaixing:
+[xuhaixing@master hadoop]$ source /etc/profile
+[xuhaixing@master hadoop]$ sudo vim ~/.bash_profile
+[xuhaixing@master hadoop]$ source ~/.bash_profile
+```
+
+`profile`
+
+```sh
+export JAVA_HOME=/usr/local/java/jdk1.8.0_212
+export PATH=${JAVA_HOME}/bin:$PATH  
+```
+
+`bash_profile`
+
+```sh
+export HADOOP_HOME=/opt/software/hadoop/hadoop-3.3.3
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+export PATH=${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:$PATH
+export PATH
+```
+
+
+
+```bash
+[xuhaixing@master hadoop]$ java -version
+java version "1.8.0_212"
+Java(TM) SE Runtime Environment (build 1.8.0_212-b10)
+Java HotSpot(TM) 64-Bit Server VM (build 25.212-b10, mixed mode)
+[xuhaixing@master hadoop]$ hadoop version
+Hadoop 3.3.3
+Source code repository https://github.com/apache/hadoop.git -r d37586cbda38c338d9fe481addda5a05fb516f71
+Compiled by stevel on 2022-05-09T16:36Z
+Compiled with protoc 3.7.1
+From source with checksum eb96dd4a797b6989ae0cdb9db6efc6
+This command was run using /opt/software/hadoop/hadoop-3.3.3/share/hadoop/common/hadoop-common-3.3.3.jar
+```
+
+
 
 <hr />
 
