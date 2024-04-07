@@ -98,6 +98,9 @@ HADOOP_HOME=/opt/software/hadoop/hadoop-3.3.3
 
 # Hive Configuration Directory can be controlled by:
 export HIVE_CONF_DIR=/opt/software/hadoop-3.3.3/etc/hadoop
+
+# Folder containing extra libraries required for hive compilation/execution can be controlled by:
+export HIVE_AUX_JARS_PATH=/opt/software/hive-3.1/lib
 ```
 
 `hive-site.xml`
