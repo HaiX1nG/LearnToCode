@@ -5,7 +5,7 @@
 我的`golang`版本为`v1.17.0`，安装gin框架的时候别忘了注意自己的golang版本，否则会出现依赖错误。
 
 ```bash
-$ go get -u github.com/gin-gonic/gin@[版本号]
+    $ go get -u github.com/gin-gonic/gin@[版本号]
 ```
 
 下面是一个简单的demo:
