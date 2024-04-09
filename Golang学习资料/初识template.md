@@ -201,3 +201,257 @@ func main() {
 </ul>
 ```
 
+<hr />
+
+## 模版继承
+
+示例:
+
+`main.go`
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"text/template"
+)
+
+func index(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./lesson02/index.tmpl")
+	if err != nil {
+		fmt.Printf("Parse template failed,err:%v\n", err)
+		return
+	}
+	msg := "这里是index页面"
+	err = t.Execute(w, msg)
+	if err != nil {
+		fmt.Printf("rander template failed,err:%v\n", err)
+		return
+	}
+}
+
+func home(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./lesson02/home.tmpl")
+	if err != nil {
+		fmt.Printf("Parse template failed,err:%v\n", err)
+		return
+	}
+	msg := "这里是home页面"
+	err = t.Execute(w, msg)
+	if err != nil {
+		fmt.Printf("rander template failed,err:%v\n", err)
+		return
+	}
+}
+
+func index1(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./lesson02/templates/base.tmpl", "./lesson02/templates/index.tmpl")
+	if err != nil {
+		fmt.Printf("Parse template failed,err:%v\n", err)
+	}
+
+	name := "小王子"
+	err = t.ExecuteTemplate(w, "index.tmpl", name)
+}
+
+func home1(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./lesson02/templates/base.tmpl", "./lesson02/templates/home.tmpl")
+	if err != nil {
+		fmt.Printf("Parse template failed,err:%v\n", err)
+	}
+	name := "Kato Megumi"
+	err = t.ExecuteTemplate(w, "home.tmpl", name)
+}
+
+func main() {
+	http.HandleFunc("/index", index)
+	http.HandleFunc("/home", home)
+	http.HandleFunc("/index1", index1)
+	http.HandleFunc("/home1", home1)
+	err := http.ListenAndServe(":9090", nil)
+	if err != nil {
+		fmt.Printf("HTTP server start failed,err:%v\n", err)
+		return
+	}
+}
+```
+
+`index.tmpl`
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <title>模版继承</title>
+        <style>
+            * {
+                margin: 0;
+            }
+            .nav {
+                width: 100%;
+                height: 50px;
+                position: fixed;
+                top: 0;
+                background-color: lightskyblue;
+            }
+            .main{
+                margin-top: 50px;
+            }
+            .menu {
+                width: 20%;
+                height: 100%;
+                position: fixed;
+                left: 0;
+                background-color: antiquewhite;
+            }
+            .center {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="nav"></div>
+        <div class="main">
+            <div class="menu"></div>
+            <div class="content center">
+                <h1>这里是index</h1>
+                <p>Hello {{ . }}</p>
+            </div>
+        </div>
+    </body>
+</html>
+```
+
+`home.tmpl`
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>模版继承</title>
+    <style>
+        * {
+            margin: 0;
+        }
+        .nav {
+            width: 100%;
+            height: 50px;
+            position: fixed;
+            top: 0;
+            background-color: lightskyblue;
+        }
+        .main{
+            margin-top: 50px;
+        }
+        .menu {
+            width: 20%;
+            height: 100%;
+            position: fixed;
+            left: 0;
+            background-color: antiquewhite;
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="nav"></div>
+<div class="main">
+    <div class="menu"></div>
+    <div class="content center">
+        <h1>这里是home</h1>
+        <p>Hello {{ . }}</p>
+    </div>
+</div>
+</body>
+</html>
+```
+
+`templates/base.tmpl`
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>模版继承</title>
+    <style>
+        * {
+            margin: 0;
+        }
+        .nav {
+            width: 100%;
+            height: 50px;
+            position: fixed;
+            top: 0;
+            background-color: lightskyblue;
+        }
+        .main{
+            margin-top: 50px;
+        }
+        .menu {
+            width: 20%;
+            height: 100%;
+            position: fixed;
+            left: 0;
+            background-color: antiquewhite;
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="nav"></div>
+<div class="main">
+    <div class="menu"></div>
+    <div class="content center">
+        {{ block "content" . }}
+
+        {{ end }}
+    </div>
+</div>
+</body>
+</html>
+```
+
+`templates/index.tmpl`
+
+```html
+{{/*继承根模版*/}}
+{{ template "base.tmpl" . }}
+{{/*重新定义块模版*/}}
+{{ define "content" }}
+    <h1>这里是index页面</h1>
+    <p>Hello {{ . }}</p>
+{{ end }}
+```
+
+`templates/home.tmpl`
+
+```html
+{{/*继承根模版*/}}
+{{ template "base.tmpl" . }}
+{{/*重新定义块模版*/}}
+{{ define "content" }}
+    <h1>这里是home页面</h1>
+    <p>Hello {{ . }}</p>
+{{ end }}
+```
+
+<hr />
+
+## 修改默认的标识符
+
+Go标准库的模版引擎使用花括号`{{ }}`作为标识符，，而许多前端框架（如`Vue`和`React`等）也使用`{{ }}`作为标识符，所以我们同时使用Go语言模版引擎和前端框架时就会出现冲突，这个时候我们修改前端的或者修改Go语言模版引擎默认的标识符：
+
+```go
+template.New("test").Delins("{[", "]}").ParseFiles("./t.tmpl")
+```
+
+## text/template和html/template的区别
+
+`text/template`和`html/template`的最大区别就是一个可以解析html标签并渲染，而一个不能。
+
