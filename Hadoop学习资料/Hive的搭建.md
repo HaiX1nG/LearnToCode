@@ -146,6 +146,7 @@ export HIVE_AUX_JARS_PATH=/opt/software/hive-3.1/lib
 [xuhaixing@master conf]$ cd ..
 [xuhaixing@master hive-3.1]$ sudo mv /var/ftp/pub/mysql-connector-java-5.1.47/mysql-connector-java-5.1.47.jar /opt/software/hive-3.1/lib/
 [xuhaixing@master hive-3.1]$ sudo mv /var/ftp/pub/mysql-connector-java-5.1.47/mysql-connector-java-5.1.47-bin.jar /opt/software/hive-3.1/lib/
+[xuhaixing@master hive-3.1]$ sudo chown -R xuhaixing:xuhaixing /opt/software
 ```
 
 ## 4. 初始化hive
