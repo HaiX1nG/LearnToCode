@@ -3258,6 +3258,14 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
                 <name>hadoop.tmp.dir</name>
                 <value>/opt/software/hadoop/hadoop-3.3.3/tmp/</value>
         </property>
+         <property>
+                <name>hadoop.proxyuser.xuhaixing.hosts</name> <!--这里的xuhaixing换成自己的mysql用户名-->
+                <value>*</value>
+        </property>
+        <property>
+                <name>hadoop.proxyuser.xuhaixing.groups</name> <!--这里的xuhaixing换成自己的mysql用户名-->
+                <value>*</value>
+        </property>
 </configuration>
 ```
 
