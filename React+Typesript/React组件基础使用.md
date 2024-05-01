@@ -23,7 +23,7 @@ graph TD
 
 ​	在React中，一个组件就是__首字母大写的函数__，内部存放了组件的逻辑和视图UI，渲染组件只需要把组件__当成标签书写__即可。
 
-```react
+```tsx
 // 1.定义组件
 function Button() {
   // 组件内部逻辑
@@ -33,7 +33,7 @@ function Button() {
 export default Button
 ```
 
-```react
+```tsx
 function App() {
   // 2.使用组件
   return (

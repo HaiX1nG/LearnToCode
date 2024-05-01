@@ -2,7 +2,7 @@
 
 语法：on + 事件名称 = {事件处理程序}，整体上遵循驼峰命名法。
 
-```react
+```tsx
 function App() {
   const clickHandler = () => {
     console.log('button按钮点击了')
@@ -17,7 +17,7 @@ function App() {
 
 语法：在事件回调函数中设置形参`e`。
 
-```react
+```tsx
 function App() {
   const clickHandler = (e) => {
     console.log('button按钮点击了', e)
@@ -30,7 +30,7 @@ function App() {
 
 语法：事件绑定的位置_改造成箭头函数_的写法，在执行clickHandler实际处理业务函数的时候传递实参。
 
-```react
+```tsx
 function App() {
   const clickHandler = (name) => {
     console.log('button按钮点击了', name)
@@ -45,7 +45,7 @@ function App() {
 
 语法：在事件绑定的位置传递实参`e`和自定义参数，clickHandler中声明形参，注意顺序对应。
 
-```react
+```tsx
 function App() {
   const clickHandler = (name, e) => {
     console.log('button按钮点击了', name, e)

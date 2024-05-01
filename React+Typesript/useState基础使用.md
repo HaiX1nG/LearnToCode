@@ -10,7 +10,7 @@ graph LR
 
 本质：和普通JS变量不同的是，状态变量一旦发生变化组件UI也会跟着变化（_数据驱动视图_）。
 
-```react
+```tsx
 import React, { useState } from 'react'
 
 const UseState = () => {

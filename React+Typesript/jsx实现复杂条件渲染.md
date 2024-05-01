@@ -11,7 +11,7 @@ graph TD
 		三图模式 --> End
 ```
 
-```react
+```tsx
 import React from 'react'
 
 const articleType = 0 // 0 1 2

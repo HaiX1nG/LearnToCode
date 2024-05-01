@@ -2,7 +2,7 @@
 
 _TypeScript是JavaScript的超集，所有的JS语句都可以是TS语句，所以所有jsx都是tsx。_
 
-```react
+```tsx
 import React from 'react'
 
 const list = [

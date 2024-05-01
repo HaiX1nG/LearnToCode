@@ -10,7 +10,7 @@
 
 1. 直接修改状态
 
-   ```react
+   ```tsx
    import React, { useState } from 'react'
    
    const UseState = () => {
@@ -36,7 +36,7 @@
    
 1. 替换状态
 
-   ```react
+   ```tsx
    import React, { useState } from 'react'
    
    const UseState = () => {
@@ -68,7 +68,7 @@
 
 规则：对于对象类型的状态变量，应该始终传给set方法一个_全新的对象_来进行修改。
 
-```react
+```tsx
 import React, { useState } from 'react'
 
 const UseStateObject = () => {

@@ -9,7 +9,7 @@ graph LR
 
 语法：在React中可以通过__逻辑运算符和三元运算符__实现基本的条件渲染。
 
-```react
+```tsx
 import React from 'react'
 
 const isLogin = true
