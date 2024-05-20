@@ -154,8 +154,8 @@ slave2
 # Example:
 spark.master                            spark://master:7077
 spark.eventLog.enabled                  true
-spark.eventLog.dir                      hdfs://master:8020/spark-logs
-spark.history.fs.logDirectory           hdfs://master:8020/spark-logs
+spark.eventLog.dir                      hdfs://master:9000/spark-logs
+spark.history.fs.logDirectory           hdfs://master:9000/spark-logs
 # spark.serializer                 org.apache.spark.serializer.KryoSerializer
 # spark.driver.memory              5g
 # spark.executor.extraJavaOptions  -XX:+PrintGCDetails -Dkey=value -Dnumbers="one two three"

@@ -3252,7 +3252,7 @@ __OKKK!坚持到这的同学你真的很棒(๑•̀ㅂ•́)و✧，给你点�
 <configuration>
         <property>
                 <name>fs.defaultFS</name>
-                <value>hdfs://master:8020</value>
+                <value>hdfs://master:9000</value>
         </property>
          <property>
                 <name>hadoop.tmp.dir</name>
