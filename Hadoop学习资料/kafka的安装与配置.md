@@ -22,7 +22,7 @@
 [xuhaixing@master ~]$ sudo tar -xvf /var/ftp/pub/kafka_2.11-2.1.1.tgz -C /opt/software/
 [sudo] password for xuhaixing:
 [xuhaixing@master ~]$ mv /opt/software/kafka_2.11-2.1.1 /opt/software/kafka-2.1.1
-[xuhaixing@master ~]$ chown -R xuhaixing:xuhaixing /opt/software/kafka-2.1.1
+[xuhaixing@master ~]$ sudo chown -R xuhaixing:xuhaixing /opt/software/kafka-2.1.1
 ```
 
 ## 2.配置kafka
