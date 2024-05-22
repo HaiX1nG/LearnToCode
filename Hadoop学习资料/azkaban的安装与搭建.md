@@ -24,7 +24,7 @@
 - `azkaban-sql-script-2.5.0.tar.gz`
 - `azkaban-web-server-2.5.0.tar.gz`
 
-相信大家的对`ftp`的使用以及很熟练了，那么请将这三个压缩包丢入`ftp`的`pub`文件夹。
+相信大家的对`ftp`的使用已经很熟练了，那么请将这三个压缩包丢入`ftp`的`pub`文件夹。
 
 <hr />
 
