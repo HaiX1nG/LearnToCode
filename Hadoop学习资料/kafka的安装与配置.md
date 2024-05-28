@@ -21,14 +21,14 @@
 ```bash
 [xuhaixing@master ~]$ sudo tar -xvf /var/ftp/pub/kafka_2.11-2.1.1.tgz -C /opt/software/
 [sudo] password for xuhaixing:
-[xuhaixing@master ~]$ mv /opt/software/kafka_2.11-2.1.1 /opt/software/kafka-2.1.1
-[xuhaixing@master ~]$ sudo chown -R xuhaixing:xuhaixing /opt/software/kafka-2.1.1
+[xuhaixing@master ~]$ mv /opt/software/kafka_2.11-2.1.1 /opt/software/kafka_2.11
+[xuhaixing@master ~]$ sudo chown -R xuhaixing:xuhaixing /opt/software/kafka_2.11
 ```
 
 ## 2.配置kafka
 
 ```bash
-[xuhaixing@master ~]$ cd /opt/software/kafka-2.1.1/config/
+[xuhaixing@master ~]$ cd /opt/software/kafka_2.11/config/
 [xuhaixing@master config]$ ll
 total 68
 -rw-r--r--. 1 root root  906 Feb  9  2019 connect-console-sink.properties
@@ -60,9 +60,9 @@ zookeeper.connect=master:2181,slave1:2181,slave2:2181
 分发kafka：
 
 ```bash
-[xuhaixing@master config]$ scp -r /opt/software/kafka-2.1.1 xuhaixing@slave1:/opt/software/
+[xuhaixing@master config]$ scp -r /opt/software/kafka_2.11 xuhaixing@slave1:/opt/software/
 # 省略分发的内容
-[xuhaixing@master config]$ scp -r /opt/software/kafka-2.1.1 xuhaixing@slave2:/opt/software/
+[xuhaixing@master config]$ scp -r /opt/software/kafka_2.11 xuhaixing@slave2:/opt/software/
 # 省略分发的内容
 ```
 
@@ -99,7 +99,7 @@ export SPARK_HOME=/opt/software/spark-3.2
 export HIVE_HOME=/opt/software/hive-3.1
 export HBASE_HOME=/opt/software/hbase-2.2
 export AZKABAN_HOME=/opt/software/azkaban
-export KAFKA_HOME=/opt/software/kafka-2.1.1 # 添加了这个
+export KAFKA_HOME=/opt/software/kafka_2.11 # 添加了这个
 
 export PATH=$HOME/.local/bin:$HOME/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${ZOOKEEPER_HOME}/bin:${SPARK_HOME}/bin:${SPARK_HOME}/sbin:${HIVE_HOME}/bin:${HBASE_HOME}/bin:${AZKABAN_HOME}/azkaban-executor/bin:${AZKABAN_HOME}/azkaban-web/bin:${KAFKA_HOME}/bin:$PATH # 这个
 
