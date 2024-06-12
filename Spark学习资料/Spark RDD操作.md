@@ -63,3 +63,30 @@ scala> EmpInfo_sortBy_id.take(10)
 res10: Array[(Int, String)] = Array((1934,1934,Kristin Cooley,F,7/2/78,42,84794,64902,19892,Solutions Architect.Senior II.,Service Delivery Special Projects), (2809,2809,Lessie Donovan,F,11/10/75,44,101096,75082,26014,Manager..Travel and Vendor Management,Global Procurement), (2810,2810,Kristine Werner,F,30/06/1978,42,213442,110865,102577,Director..Program Management,Wizards Program), (2815,2815,Young Knapp,F,20/04/1970,50,73138,48557,24581,Accountant.Senior.,Finance - Accounting), (2823,2823,Stephan Benjamin,M,2/11/75,44,188721,103452,85269,Manager.Senior.Platform Operations,GPO PMO & Business Operations), (2824,2824,Milo Tapia,M,21/10/1979,40,247196,124512,122684,Manager.Senior.Engineering,Media Analytics), (2830,2830,Micheal Wall,M,21/10/1975,44,145104,69795...
 ```
 
+## 使用collect()方法查询数据
+
+- collect()方法是一种行动操作，可以将RDD转换为少量数据储存
+
+
+
+<hr />
+
+## 什么是(Transformation)转换算子和(Action)行动算子
+
+__Transformation转换算子:__
+
+- 将所有转换算子在执行完毕后，都会返回一个新的RDD
+- 说有的转换算子都是【Lazy惰性】，并不会立即执行，仅仅是在定义计算的规则
+- 转换算子必须遇到【Action动作算子】才会触发执行
+
+__Action动作算子:__
+
+- 动作算子在执行后，不会返回一个RDD。【要么没有返回值，要么返回的数据类型不是RDD】
+- 动作算子都是【立即执行】的，一个动作算子就会产生一个Job的任务，并且会执行这个动作算子所依赖的其他所有RDD
+
+<hr />
+
+宽依赖和窄依赖:
+
+- 窄依赖：表现为一个父RDD的分区对应一个RDD的分区或者多个父RDD分区对应一个子RDD
+- 宽依赖：表现为多个父RDD
